@@ -95,47 +95,32 @@ Circle.prototype.draw = function (ctx) {
     ctx.closePath();
 }
 
+
+// the "main" code begins here
+console.log("main");
 var friction = 1;
 var acceleration = 100;
 var maxSpeed = 200;
 
-
-
-
-
-
-
-
-// the "main" code begins here
-
 var ASSET_MANAGER = new AssetManager();
+var gameEngine = new GameEngine();
 
 ASSET_MANAGER.queueDownload("./img/960px-Blank_Go_board.png");
 ASSET_MANAGER.queueDownload("./img/black.png");
 ASSET_MANAGER.queueDownload("./img/white.png");
-
 ASSET_MANAGER.downloadAll(function () {
-
-    var socket = io.connect("http://76.28.150.193:8888");
-
-    socket.on("ping", function (ping) {
-       console.log(ping);
-       socket.emit("pong");
-   });
-
-
-
 
     var canvas = document.getElementById('gameWorld');
     var ctx = canvas.getContext('2d');
 
-    var gameEngine = new GameEngine();
     var circle = new Circle(gameEngine);
 
     for (var i = 0; i < 4; i++) {
         circle = new Circle(gameEngine);
         circle.color = 0;
         circle.radius = 10;
+        circle.idNum=gameEngine.entities.length;
+        console.log("length of entities was " + gameEngine.entities.length + " before adding ball." );
         gameEngine.addEntity(circle);
     };
 
@@ -143,6 +128,8 @@ ASSET_MANAGER.downloadAll(function () {
         circle = new Circle(gameEngine);
         circle.color = 1;
         circle.radius = 20;
+        circle.idNum=gameEngine.entities.length;
+        console.log("length of entities was " + gameEngine.entities.length + " before adding ball." );
         gameEngine.addEntity(circle);
     };
 
@@ -151,9 +138,68 @@ ASSET_MANAGER.downloadAll(function () {
         circle = new Circle(gameEngine);
         circle.color = 2;
         circle.radius = 30;
+        circle.idNum=gameEngine.entities.length;
+        console.log("length of entities was " + gameEngine.entities.length + " before adding ball." );
         gameEngine.addEntity(circle);
     };
 
     gameEngine.init(ctx);
     gameEngine.start();
 });
+
+
+
+var socket = io.connect("http://76.28.150.193:8888");
+
+
+function myLoadFunction() {
+    document.getElementById("LoadButton").style.color = "red";
+    console.log("Loading");
+
+    var x = socket.emit("load", { studentname: "Arshdeep Singh", statename: "allBallInfo"});
+}
+
+
+socket.on("load", function (data) {
+    for(var i = 0; i < gameEngine.entities.length; i++) {
+        gameEngine.entities[i].id=data.data.idArray[i];
+        gameEngine.entities[i].radius=data.data.radiusArray[i];
+        gameEngine.entities[i].color=data.data.colorArray[i];
+        gameEngine.entities[i].velocity.x=data.data.xVelArray[i];
+        gameEngine.entities[i].velocity.y=data.data.yVelArray[i];
+        gameEngine.entities[i].x=data.data.xPosArray[i];
+        gameEngine.entities[i].y=data.data.yPosArray[i];
+    }
+});
+
+
+
+
+function mySaveFunction() {
+    console.log("Saving");
+    document.getElementById("LoadButton").style.color = "blue";
+
+    var idArray=[];
+    var radiusArray=[];
+    var colorArray=[];
+    var xVelArray=[];
+    var yVelArray=[];
+    var xPosArray=[];
+    var yPosArray=[];
+
+    //traverse throught the entities array and seperate out the important values.
+    for (var i = 0; i < gameEngine.entities.length; i++) {
+        idArray.push(gameEngine.entities[i].idNum);
+        radiusArray.push(gameEngine.entities[i].radius);
+        colorArray.push(gameEngine.entities[i].color);
+        xVelArray.push(gameEngine.entities[i].velocity.x);
+        yVelArray.push(gameEngine.entities[i].velocity.y);
+        xPosArray.push(gameEngine.entities[i].x);
+        yPosArray.push(gameEngine.entities[i].y);
+    }
+
+    socket.emit("save", { studentname: "Arshdeep Singh", statename: "allBallInfo", data: {idArray: idArray, radiusArray: radiusArray,
+                                                                colorArray: colorArray, xVelArray: xVelArray, yVelArray, yVelArray,
+                                                                xPosArray: xPosArray, yPosArray: yPosArray}
+                                                            });
+}
