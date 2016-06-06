@@ -26,8 +26,10 @@
         The balls will move around and try to form cliques.
         <ul>
             <li>When a clique is formed, the balls will move around together.</li>
+            <li>The balls don't necessarily have to be touching to form a clique</li>
             <li> Note that the balls are not racist. They don't let color get in the way of friendship.</li>
             <li> Also, larger balls dominate and sometimes move on top of the smaller ones. </li>
+            <li> And, same size balls will sometimes overlap one another. </li>
         </ul>
     </div>
     <div style="position: absolute; top:320px; left:890px; width:600px; height:25px">
@@ -42,11 +44,15 @@
         Note that a lone ball is capable of stealing members from a clique.
     </div>
 
-
     <canvas id="gameWorld" width="800" height="800" style="border: 1px solid white; background: oldlace"></canvas>
 
-    <button id="SaveButton" onclick="mySaveFunction()">Save</button>
-    <button id="LoadButton" onclick="myLoadFunction()">Load!</button>
+
+        <button id="SaveButton" style="position: absolute; top:600px; left:900; width:200px; height:15px" onclick="mySaveFunction()">Save</button>
+        <button id="LoadButton" style="position: absolute; top:600px; left:1020px; width:200px; height:15px" onclick="myLoadFunction()">Load!</button>
+
+
+
+
 
 </body>
 </html>
